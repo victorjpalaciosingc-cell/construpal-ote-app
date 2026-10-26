@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#123d70">
+<title>Construpal OTE | Cotizaciones</title>
+<style>
+:root{--navy:#123d70;--blue:#2466a6;--pale:#edf3fa;--ink:#172536;--muted:#64748b;--line:#dbe3ed;--bg:#f5f7fb}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:var(--ink)}
+header{background:linear-gradient(120deg,#102f55,#2466a6);color:white;padding:22px 18px 26px}
+.wrap{max-width:760px;margin:auto} .brand{font-weight:800;letter-spacing:.06em;font-size:13px;opacity:.9}.subbrand{font-size:12px;opacity:.8;margin-top:3px}
+h1{font-size:25px;line-height:1.15;margin:17px 0 6px}header p{margin:0;color:#e0eafa;font-size:14px}
+nav{display:flex;gap:8px;padding:12px 16px;max-width:760px;margin:auto}
+nav button{flex:1;border:1px solid var(--line);border-radius:12px;padding:11px 6px;background:white;color:var(--navy);font-weight:700}
+nav button.active{background:var(--navy);color:white;border-color:var(--navy)}
+main{max-width:760px;margin:auto;padding:0 16px 30px}.panel{background:white;border:1px solid var(--line);border-radius:17px;padding:17px;margin:0 0 14px;box-shadow:0 3px 12px #142b4510}
+h2{font-size:17px;margin:0 0 14px}.field{margin-bottom:14px}label{display:block;font-size:13px;font-weight:700;margin-bottom:6px;color:#334155}
+input,select,textarea{width:100%;padding:12px;border:1px solid #cbd5e1;border-radius:10px;background:#fff;color:var(--ink);font:inherit}
+input[type=range]{padding:0;accent-color:var(--blue)}.twocol{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.value{font-weight:800;color:var(--navy)}.row{display:flex;justify-content:space-between;gap:10px;align-items:center;margin:9px 0;font-size:14px}.muted{color:var(--muted);font-size:12px;line-height:1.45}
+.total{background:var(--pale);border-radius:14px;padding:16px;margin-top:14px}.total small{font-size:11px;letter-spacing:.08em;font-weight:800;color:#47617f}.total strong{display:block;font-size:30px;color:var(--navy);margin:5px 0}
+button.primary,button.secondary,button.danger{border:0;border-radius:11px;padding:12px 14px;font:inherit;font-weight:750;cursor:pointer}
+button.primary{background:var(--navy);color:white;width:100%}button.secondary{background:var(--pale);color:var(--navy)}button.danger{background:#fff0f0;color:#9f2424}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.actions button{flex:1}
+.hidden{display:none!important}.record{padding:13px 0;border-bottom:1px solid var(--line)}.record:last-child{border-bottom:0}.record strong{display:block}.record .row{margin:4px 0}
+footer{text-align:center;padding:0 18px 24px;color:var(--muted);font-size:11px}
+@media(max-width:480px){.twocol{grid-template-columns:1fr 1fr;gap:9px}h1{font-size:23px}.panel{padding:14px}.total strong{font-size:27px}}
+</style>
+</head>
+<body>
+<header><div class="wrap"><div class="brand">CONSTRUPAL</div><div class="subbrand">INGENIERÍA Y CONSTRUCCIÓN · OTE</div><h1>Calculadora de cotizaciones</h1><p>Calcula, guarda y da seguimiento a tus servicios técnicos.</p></div></header>
+<nav><button id="tabCalc" class="active" onclick="showTab('calc')">Calculadora</button><button id="tabHistory" onclick="showTab('history')">Cotizaciones guardadas</button></nav>
+<main>
+<section id="calc">
+<div class="panel">
+<h2>1. Datos del encargo</h2>
+<div class="field"><label for="client">Cliente / empresa (opcional)</label><input id="client" placeholder="Nombre del cliente o empresa"></div>
+<div class="field"><label for="service">Servicio</label><select id="service" onchange="serviceChanged()"><option value="Revisión de presupuesto">Revisión de presupuesto</option><option value="Cubicación" selected>Cubicación</option><option value="Presupuesto detallado">Presupuesto detallado</option><option value="Apoyo técnico especial">Apoyo técnico especial</option></select></div>
+<div class="twocol">
+<div class="field"><label for="hours">Horas estimadas</label><input id="hours" type="number" min="1" max="500" value="8" oninput="calc()"></div>
+<div class="field"><label for="rate">Tarifa interna por hora ($)</label><input id="rate" type="number" min="0" step="1000" value="35000" oninput="calc()"></div>
+</div>
+<div class="twocol">
+<div class="field"><label for="direct">Costos directos ($)</label><input id="direct" type="number" min="0" step="1000" value="5000" oninput="calc()"></div>
+<div class="field"><label for="general">Gastos generales asignados ($)</label><input id="general" type="number" min="0" step="1000" value="10000" oninput="calc()"></div>
+</div>
+<div class="field"><label for="reserve">Reserva por complejidad: <span id="reserveLabel">15%</span></label><input id="reserve" type="range" min="0" max="40" step="5" value="15" oninput="reserveLabel.textContent=this.value+'%';calc()"></div>
+<div class="field"><label for="urgency">Plazo</label><select id="urgency" onchange="calc()"><option value="1">Normal</option><option value="1.25">Urgente (+25%)</option><option value="1.4">Muy urgente (+40%)</option></select></div>
+<div class="field"><label for="scope">Alcance / límites del encargo</label><textarea id="scope" rows="3" placeholder="Ej.: cubicación de partidas indicadas en planos recibidos; una ronda de ajustes menores."></textarea></div>
+<div class="field"><label for="payment">Condiciones de pago</label><select id="payment"><option>50% anticipo y 50% contra entrega</option><option>100% contra entrega</option><option>Pago por hitos acordados</option></select></div>
+</div>
+<div class="panel">
+<h2>2. Resultado estimado</h2>
+<div class="row"><span>Horas × tarifa interna</span><strong id="labor">$280.000</strong></div>
+<div class="row"><span>Costos directos</span><strong id="directOut">$5.000</strong></div>
+<div class="row"><span>Gastos generales asignados</span><strong id="generalOut">$10.000</strong></div>
+<div class="row"><span>Reserva y urgencia</span><strong id="reserveOut">$44.250</strong></div>
+<div class="total"><small>PRECIO SUGERIDO NETO</small><strong id="total">$390.000</strong><div class="muted">Estimación preliminar. El IVA se calcula aparte si corresponde. No confundir el precio cobrado con utilidad disponible personal.</div></div>
+<div class="actions"><button class="primary" onclick="saveQuote()">Guardar cotización</button><button class="secondary" onclick="copyQuote()">Copiar resumen</button></div>
+<p class="muted">El cálculo usa: (horas × tarifa + costos directos + gastos generales) × (1 + reserva) × factor de urgencia, redondeado hacia arriba al millar. No reemplaza la revisión de alcance ni la validación tributaria.</p>
+</div>
+</section>
+<section id="history" class="hidden"><div class="panel"><h2>Cotizaciones guardadas</h2><p class="muted">Los registros se guardan en este navegador de este dispositivo. No se sincronizan automáticamente con otros equipos.</p><div id="records"></div><div class="actions"><button class="secondary" onclick="exportCSV()">Exportar CSV</button><button class="danger" onclick="clearQuotes()">Borrar historial</button></div></div></section>
+</main>
+<footer>Prototipo inicial · Construpal OTE · Revisa los precios y condiciones antes de emitir una cotización formal.</footer>
+<script>
+const $=id=>document.getElementById(id);
+const money=n=>new Intl.NumberFormat('es-CL',{style:'currency',currency:'CLP',maximumFractionDigits:0}).format(Math.round(n||0));
+function serviceChanged(){const s=$('service').value;$('hours').value=s==='Revisión de presupuesto'?5:s==='Cubicación'?8:s==='Presupuesto detallado'?14:6;calc()}
+function calc(){
+ let h=Math.max(0,Number($('hours').value)||0),r=Math.max(0,Number($('rate').value)||0),d=Math.max(0,Number($('direct').value)||0),g=Math.max(0,Number($('general').value)||0),p=Number($('reserve').value)||0,u=Number($('urgency').value)||1;
+ let labor=h*r,base=labor+d+g,total=Math.ceil((base*(1+p/100)*u)/1000)*1000;
+ $('labor').textContent=money(labor);$('directOut').textContent=money(d);$('generalOut').textContent=money(g);$('reserveOut').textContent=money(total-base);$('total').textContent=money(total);
+ return {labor,d,g,p,u,total,h,r,base};
+}
+function showTab(tab){$('calc').classList.toggle('hidden',tab!=='calc');$('history').classList.toggle('hidden',tab!=='history');$('tabCalc').classList.toggle('active',tab==='calc');$('tabHistory').classList.toggle('active',tab==='history');if(tab==='history')renderQuotes()}
+function getQuotes(){try{return JSON.parse(localStorage.getItem('construpal_quotes')||'[]')}catch(e){return []}}
+function saveQuotes(q){localStorage.setItem('construpal_quotes',JSON.stringify(q))}
+function saveQuote(){
+ const c=calc(),q=getQuotes();q.unshift({id:Date.now(),date:new Date().toLocaleDateString('es-CL'),client:$('client').value.trim()||'Cliente sin nombre',service:$('service').value,scope:$('scope').value,payment:$('payment').value,total:c.total,hours:c.h,rate:c.r,direct:c.d,general:c.g,reserve:c.p,urgency:$('urgency').selectedOptions[0].text,status:'Por enviar'});
+ saveQuotes(q);alert('Cotización guardada en este dispositivo.');}
+function copyQuote(){const c=calc();const t=`CONSTRUPAL OTE — COTIZACIÓN PRELIMINAR\nCliente: ${$('client').value||'Por definir'}\nServicio: ${$('service').value}\nHoras estimadas: ${c.h}\nPrecio sugerido neto: ${money(c.total)}\nPlazo: ${$('urgency').selectedOptions[0].text}\nAlcance: ${$('scope').value||'Por definir'}\nPago: ${$('payment').value}\nNota: precio preliminar, IVA según corresponda. Confirmar alcance y condiciones antes de emitir.`;if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(()=>alert('Resumen copiado.')).catch(()=>prompt('Copia el texto:',t))}else prompt('Copia el texto:',t)}
+function renderQuotes(){const q=getQuotes();$('records').innerHTML='';if(!q.length){$('records').innerHTML='<p class="muted">Todavía no hay cotizaciones guardadas.</p>';return}q.forEach(x=>{const d=document.createElement('div');d.className='record';const top=document.createElement('div');top.className='row';const title=document.createElement('strong');title.textContent=x.client;const amt=document.createElement('strong');amt.textContent=money(x.total);top.append(title,amt);const info=document.createElement('div');info.className='muted';info.textContent=`${x.date} · ${x.service} · ${x.status}`;const status=document.createElement('select');['Por enviar','Enviada','En negociación','Aceptada','Rechazada','Finalizada'].forEach(s=>{const o=document.createElement('option');o.textContent=s;o.selected=s===x.status;status.append(o)});status.onchange=()=>{let all=getQuotes();let ix=all.findIndex(z=>z.id===x.id);if(ix>=0){all[ix].status=status.value;saveQuotes(all);renderQuotes()}};const del=document.createElement('button');del.className='secondary';del.textContent='Eliminar';del.onclick=()=>{saveQuotes(getQuotes().filter(z=>z.id!==x.id));renderQuotes()};const actions=document.createElement('div');actions.className='actions';actions.append(status,del);d.append(top,info,actions);$('records').append(d)})}
+function exportCSV(){const q=getQuotes();if(!q.length){alert('No hay cotizaciones para exportar.');return}const keys=['date','client','service','total','hours','rate','status','scope','payment'];const esc=v=>'"'+String(v??'').replace(/"/g,'""')+'"';const csv=[keys.join(';'),...q.map(x=>keys.map(k=>esc(x[k])).join(';'))].join('\r\n');const blob=new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8;'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='Construpal_OTE_Cotizaciones.csv';a.click();URL.revokeObjectURL(a.href)}
+function clearQuotes(){if(confirm('¿Borrar todas las cotizaciones guardadas en este navegador?')){saveQuotes([]);renderQuotes()}}
+calc();
+</script>
+</body></html>
